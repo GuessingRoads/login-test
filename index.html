@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Know the Roads</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    #login-btn, #logout-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      padding: 10px 14px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    #logout-btn { right: 130px; }
+  </style>
+</head>
+<body>
+  <h1>Know the Roads (Login Test with Redirect Fixed)</h1>
+
+  <button id="login-btn">Login with Google</button>
+  <button id="logout-btn">Logout</button>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabase = createClient(
+      'https://yulvzmznvnctgaiwuypb.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1bHZ6bXpudm5jdGdhaXd1eXBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyNzEzNjMsImV4cCI6MjA2Nzg0NzM2M30.7LOh2rqTkdB4oNJuFTd5o9snzX9dA7AOkmt7y9prQgM'
+    );
+
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    loginBtn.onclick = async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.href
+        }
+      });
+      if (error) alert('Login error: ' + error.message);
+    };
+
+    logoutBtn.onclick = async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        alert('Logout error: ' + error.message);
+      } else {
+        alert('Logged out successfully');
+        location.reload();
+      }
+    };
+
+    const checkLogin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        alert('Logged in as: ' + user.email);
+      }
+    };
+
+    checkLogin();
+  </script>
+</body>
+</html>
